@@ -1,0 +1,17 @@
+@page
+@model VanderCake.Server.Pages.Admin.CustomersModel
+@{ ViewData["Title"] = "Customers"; }
+<div class="page-heading"><div><p class="eyebrow">COMMERCIAL</p><h1>Customers</h1><p>Manage portfolios, visit sequence and contact details.</p></div><a class="button" asp-page="Customers">New customer</a></div>
+<form method="get" class="filters"><label for="q">Customer name</label><input id="q" name="q" value="@Request.Query["q"]" placeholder="Search customers" /><button class="secondary">Search</button><a asp-page="Customers">Clear</a></form>
+<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Salesperson</th><th>Visit</th><th>Status</th><th>Action</th></tr></thead><tbody>
+@foreach (var c in Model.Customers) { <tr><td><strong>@c.Name</strong><small class="block">@c.Phone · @c.Address</small></td><td>@Model.Salespersons.FirstOrDefault(s => s.Id == c.SalespersonId)?.Name</td><td>@c.VisitOrder</td><td><span class="badge">@(c.IsActive ? "Active" : "Inactive")</span></td><td><a asp-page="Customers" asp-route-id="@c.Id">Edit &amp; balance</a></td></tr> }
+</tbody></table>@if (Model.Customers.Count == 0) { <p class="empty">No customers match this search.</p> }</div><p class="hint">Portfolio list displays up to 500 records.</p>
+<h2>@(Model.Id.HasValue ? "Edit customer" : "New customer")</h2>
+@if (Model.Balance is { } b) { <div class="summary-strip"><span>Open principal <strong>R$ @((b.OpenPrincipalMinor / 100m).ToString("N2"))</strong></span><span>Payable today <strong>R$ @((b.PayableMinor / 100m).ToString("N2"))</strong></span><a asp-page="Receivables" asp-route-customerId="@Model.Id">View installments</a></div> }
+<form method="post" class="panel form-grid"><div asp-validation-summary="All" role="alert"></div><input type="hidden" asp-for="Id" /><input type="hidden" asp-for="Version" />
+<label asp-for="Form.Name">Customer name<input asp-for="Form.Name" required maxlength="160" /></label>
+<label asp-for="Form.SalespersonId">Assigned salesperson<select asp-for="Form.SalespersonId" required><option value="">Choose salesperson</option>@foreach (var s in Model.Salespersons.Where(s => s.IsActive || s.Id == Model.Form.SalespersonId)) { <option value="@s.Id">@s.Name @(s.IsActive ? "" : "(inactive)")</option> }</select></label>
+<label asp-for="Form.CityId">City / state<select asp-for="Form.CityId" required><option value="">Choose city</option>@foreach (var city in Model.Cities) { <option value="@city.Id">@city.Name / @Model.States.FirstOrDefault(s => s.Id == city.StateId)?.Code</option> }</select></label>
+<label asp-for="Form.VisitOrder">Visit sequence<input asp-for="Form.VisitOrder" min="1" required /></label>
+<label asp-for="Form.Address">Address<input asp-for="Form.Address" required maxlength="240" /></label><label asp-for="Form.Phone">Phone<input asp-for="Form.Phone" required maxlength="30" /></label>
+<label class="check"><input asp-for="Form.IsActive" /> Active customer</label><div class="form-actions"><button>Save customer</button><a asp-page="Customers">Cancel</a></div></form>

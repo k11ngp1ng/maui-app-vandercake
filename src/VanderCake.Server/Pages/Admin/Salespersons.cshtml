@@ -1,0 +1,9 @@
+@page
+@model VanderCake.Server.Pages.Admin.SalespersonsModel
+@{ ViewData["Title"] = "Salespeople"; }
+<div class="page-heading"><div><p class="eyebrow">COMMERCIAL</p><h1>Salespeople</h1><p>Account access and portfolio ownership.</p></div><a class="button" asp-page="Salespersons">New salesperson</a></div>
+<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr></thead><tbody>@foreach (var s in Model.Salespersons) { <tr><td>@s.Name</td><td>@s.Email</td><td><span class="badge">@(s.IsActive ? "Active" : "Inactive")</span></td><td><a asp-page="Salespersons" asp-route-id="@s.Id">Edit</a></td></tr> }</tbody></table>@if (Model.Salespersons.Count == 0) { <p class="empty">No salespeople yet. Create an account below.</p> }</div>
+<h2>@(Model.Id.HasValue ? "Edit salesperson" : "Create salesperson account")</h2><form method="post" class="panel form-grid"><div asp-validation-summary="All" role="alert"></div><input asp-for="Id" type="hidden" /><input asp-for="Version" type="hidden" /><label asp-for="Name">Full name<input asp-for="Name" required maxlength="160" /></label>
+@if (!Model.Id.HasValue) { <label asp-for="Email">Email<input asp-for="Email" type="email" required autocomplete="off" /></label><label asp-for="Password">Initial password<input asp-for="Password" type="password" required minlength="12" autocomplete="new-password" /><small>12+ characters, uppercase, lowercase, number and symbol. Share privately.</small></label> }
+else { <p class="hint">@Model.Email<br />Deactivation revokes existing sessions. Reassign portfolios on Customers as needed.</p><label class="check"><input asp-for="IsActive" /> Active account</label> }
+<div class="form-actions"><button>Save salesperson</button><a asp-page="Salespersons">Cancel</a></div></form>

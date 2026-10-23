@@ -1,0 +1,5 @@
+@page
+@model VanderCake.Server.Pages.Admin.SalesModel
+@{ ViewData["Title"] = "Sales"; }
+<p class="eyebrow">COMMERCIAL</p><h1>Sales</h1><p>Confirmed sales generated from fulfilled quantities.</p><form method="get" class="filters"><label for="q">Customer</label><input name="q" id="q" value="@Request.Query["q"]" /><button class="secondary">Search</button><a asp-page="Sales">Clear</a></form>
+<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Sale date</th><th>Total BRL</th><th>Action</th></tr></thead><tbody>@foreach (var s in Model.Sales) { <tr><td>@s.CustomerName</td><td>@s.Date.ToString("dd MMM yyyy")</td><td>@((s.TotalMinor / 100m).ToString("N2"))</td><td><a asp-page="Sale" asp-route-id="@s.Id">Sale &amp; installments</a></td></tr> }</tbody></table>@if (Model.Sales.Count == 0) { <div class="empty"><h2>No sales to show</h2><p>Confirm a positive allocation to generate a sale.</p><a asp-page="Orders">Review pending orders</a></div> }</div>

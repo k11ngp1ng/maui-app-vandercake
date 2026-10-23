@@ -1,0 +1,6 @@
+@page
+@model VanderCake.Server.Pages.Admin.GroupsModel
+@{ ViewData["Title"] = "Product groups"; }
+<div class="page-heading"><div><p class="eyebrow">INVENTORY</p><h1>Product groups</h1><p>Organize the catalog into clear categories.</p></div><a class="button" asp-page="Groups">New group</a></div>
+<div class="table-wrap"><table><thead><tr><th>Group</th><th>Action</th></tr></thead><tbody>@foreach (var g in Model.Groups) { <tr><td>@g.Name</td><td><a asp-page="Groups" asp-route-id="@g.Id">Rename</a></td></tr> }</tbody></table>@if (Model.Groups.Count == 0) { <p class="empty">No groups yet.</p> }</div>
+<h2>@(Model.Id.HasValue ? "Rename group" : "New group")</h2><form method="post" class="panel form-grid"><div asp-validation-summary="All" role="alert"></div><input asp-for="Id" type="hidden" /><input asp-for="Version" type="hidden" /><label asp-for="Name">Group name<input asp-for="Name" required maxlength="80" /></label><div class="form-actions"><button>Save group</button><a asp-page="Groups">Cancel</a></div></form>

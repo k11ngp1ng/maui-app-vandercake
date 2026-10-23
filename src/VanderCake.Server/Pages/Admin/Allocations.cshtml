@@ -1,0 +1,24 @@
+@page
+@model VanderCake.Server.Pages.Admin.AllocationsModel
+@{ ViewData["Title"] = "Manual allocation"; }
+<div class="page-heading"><div><p class="eyebrow">ORDER FULFILLMENT</p><h1>Manual allocation</h1><p>You choose customer quantities. The server consumes eligible lots in FEFO order.</p></div><a asp-page="Stock">Inspect stock lots →</a></div>
+<form method="get" class="filters"><label asp-for="DispatchDate">Batch dispatch date</label><input asp-for="DispatchDate" type="date" required /><button class="secondary">Load stock for date</button><span class="hint">Changing the date reloads the form and clears unsaved quantities.</span></form>
+<div asp-validation-summary="All" role="alert"></div>
+@if (Model.Pending.Count == 0) { <section class="empty"><h2>All caught up</h2><p>No submitted orders are waiting for allocation.</p><a asp-page="Sales">Review sales</a></section> }
+else {
+<form method="post" data-allocation><input type="hidden" asp-for="RequestKey" /><input type="hidden" asp-for="DispatchDate" id="AllocationDispatchDate" />
+<div class="summary-strip"><span>Dispatch <strong>@Model.DispatchDate.ToString("dd MMM yyyy")</strong></span><label asp-for="DispatchHour">Window<select asp-for="DispatchHour"><option value="12">12:00</option><option value="19">19:00</option></select></label><p>Selected orders will use this date and window.</p></div>
+<div class="table-wrap"><table><caption>Available stock for this batch</caption><thead><tr><th>Product</th><th>Eligible units</th><th>Allocated</th><th>Remaining</th></tr></thead><tbody>
+@foreach (var s in Model.Stock) { <tr data-stock="@s.ProductId" data-available="@s.EligibleQuantity"><td>@s.ProductName</td><td>@s.EligibleQuantity</td><td data-allocated>0</td><td data-remaining>@s.EligibleQuantity</td></tr> }</tbody></table></div>
+@for (var n = 0; n < Model.Orders.Count; n++) {
+    var input = Model.Orders[n]; var order = Model.Pending.FirstOrDefault(o => o.Id == input.OrderId);
+    if (order is null) { <div class="alert error">An order is no longer pending. Reload to review current orders.</div> continue; }
+    <section class="panel" data-order><div class="page-heading"><div><label class="check"><input asp-for="Orders[n].Selected" data-select /> <strong>@order.CustomerName</strong></label><p class="hint">Requested dispatch @order.DispatchDate.ToString("dd MMM yyyy") at @(order.DispatchHour):00 · Term @order.PaymentTermCode · <a asp-page="Order" asp-route-id="@order.Id">Order details</a></p></div><span class="badge warning">Submitted</span></div>
+    <input type="hidden" asp-for="Orders[n].OrderId" /><input type="hidden" asp-for="Orders[n].Version" />
+    <div class="table-wrap"><table><thead><tr><th>Product</th><th>Requested</th><th>Fulfill</th></tr></thead><tbody>@for (var j = 0; j < input.Items.Count; j++) { var item = order.Items.FirstOrDefault(i => i.Id == input.Items[j].OrderItemId); if (item is null) { continue; }
+    <tr><td>@item.ProductName</td><td>@item.RequestedQuantity</td><td><input asp-for="Orders[n].Items[j].OrderItemId" type="hidden" /><label class="sr-only" asp-for="Orders[n].Items[j].FulfilledQuantity">Fulfilled units for @order.CustomerName / @item.ProductName</label><input asp-for="Orders[n].Items[j].FulfilledQuantity" min="0" max="@item.RequestedQuantity" step="1" data-quantity data-product="@item.ProductId" data-requested="@item.RequestedQuantity" required /></td></tr>
+    }</tbody></table></div></section>
+}
+<div class="panel confirm-panel"><p id="allocation-totals" role="status" aria-live="polite">Select orders and enter quantities to fulfill.</p><p id="allocation-error" class="error-text" role="alert"></p><p>Unfulfilled units close as shortages. Zero allocation closes a selected order without a sale. All selected orders commit together; nothing is saved until confirmation.</p><label class="check"><input asp-for="Confirm" required /> I reviewed the quantities and dispatch. Finalize selected orders.</label><div class="form-actions"><button data-confirm>Confirm allocation</button><a asp-page="Orders">Cancel</a></div><noscript><p>Live totals need JavaScript. The server still validates every quantity and stock limit on confirmation.</p></noscript></div>
+</form><p class="hint">Up to 100 pending orders are shown per batch. No customer priority is applied automatically.</p>
+}

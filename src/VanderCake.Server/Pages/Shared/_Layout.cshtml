@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="color-scheme" content="light" /><title>@ViewData["Title"] · VanderCake</title><link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /><script src="~/js/site.js" asp-append-version="true" defer></script></head>
+<body class="@(User.Identity?.IsAuthenticated == true ? "signed-in" : "guest")">
+<a class="skip" href="#content">Skip to content</a>
+@if (User.Identity?.IsAuthenticated == true) {
+<aside class="sidebar"><a class="brand" asp-page="/Admin/Index"><span class="brand-mark">V</span><span>VanderCake<small>DISTRIBUTION MANAGEMENT</small></span></a><p class="nav-label">WORKSPACE</p><nav aria-label="Main navigation">
+@foreach (var item in new[] { ("Index", "Dashboard", "Overview"), ("Orders", "Orders", "Commercial"), ("Allocations", "Manual allocation", "Commercial"), ("Sales", "Sales", "Commercial"), ("Customers", "Customers", "Commercial"), ("Salespersons", "Salespeople", "Commercial"), ("Products", "Product catalog", "Inventory"), ("Groups", "Product groups", "Inventory"), ("Stock", "Stock & lots", "Inventory"), ("Receivables", "Accounts receivable", "Finance") }) {
+var current = ViewContext.RouteData.Values["page"]?.ToString() == "/Admin/" + item.Item1;
+<a asp-page="@("/Admin/" + item.Item1)" class="@(current ? "active" : "")" aria-current="@(current ? "page" : null)"><span>@item.Item2</span><small>@item.Item3</small></a>
+}
+</nav><div class="sidebar-foot"><span>Administrator workspace</span><small>Bakery supply distribution</small></div></aside>
+}
+<div class="workspace"><header class="topbar">@if (User.Identity?.IsAuthenticated == true) { <span>Administrator / @ViewData["Title"]</span><div class="user-menu"><span>@User.Identity.Name</span><form method="post" asp-page="/Admin/Logout"><button class="text-button">Log out</button></form></div> } else { <a class="brand" asp-page="/Index"><span class="brand-mark">V</span>VanderCake</a><span>Administrator portal</span> }</header>
+<main id="content" tabindex="-1">@if (User.Identity?.IsAuthenticated == true && TempData["Success"] is string message) { <div class="alert success" role="status">@message</div> }@RenderBody()</main><footer>VanderCake · Bakery supply distribution</footer></div>
+<p id="busy-status" class="busy" role="status" hidden>Saving changes…</p>@await RenderSectionAsync("Scripts", required: false)
+</body></html>

@@ -1,0 +1,7 @@
+@page "{id:guid}"
+@model VanderCake.Server.Pages.Admin.OrderModel
+@{ ViewData["Title"] = "Order details"; }
+<a class="back" asp-page="Orders">← Orders</a><div class="page-heading"><div><p class="eyebrow">ORDER DETAILS</p><h1>@Model.Order.CustomerName</h1><p>Dispatch @Model.Order.DispatchDate.ToString("dd MMM yyyy") at @(Model.Order.DispatchHour):00 · Payment term @Model.Order.PaymentTermCode</p></div><span class="badge">@Model.Order.Status</span></div>
+<p class="hint">Order @Model.Order.Id · Submitted UTC @Model.Order.SubmittedAtUtc.ToString("u")</p><div class="table-wrap"><table><thead><tr><th>Product</th><th>Requested</th><th>Fulfilled</th><th>Unfulfilled</th><th>Unit price BRL</th></tr></thead><tbody>@foreach (var i in Model.Order.Items) { <tr><td>@i.ProductName</td><td>@i.RequestedQuantity</td><td>@i.FulfilledQuantity</td><td>@i.UnfulfilledQuantity</td><td>@((i.UnitPriceMinor / 100m).ToString("N2"))</td></tr> }</tbody></table></div>
+@if (Model.Order.Status == "Submitted") { <p><a class="button" asp-page="Allocation" asp-route-id="@Model.Order.Id">Allocate this order</a> <a asp-page="Allocations">Allocate multiple orders</a></p> }
+else { <p class="alert">Finalized orders cannot be edited. <a asp-page="Sales">Review resulting sales</a>.</p> }

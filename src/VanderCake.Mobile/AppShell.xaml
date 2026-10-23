@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="VanderCake.Mobile.AppShell" Title="VanderCake" FlyoutBehavior="Disabled" Shell.BackgroundColor="#142B38" Shell.ForegroundColor="White" Shell.TitleColor="White"><ShellContent x:Name="SignIn" Title="VanderCake" Route="login" /><ShellContent x:Name="Portfolio" Title="Portfolio" Route="portfolio" /></Shell>

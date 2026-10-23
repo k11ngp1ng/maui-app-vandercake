@@ -1,0 +1,12 @@
+@page
+@model VanderCake.Server.Pages.Admin.IndexModel
+@{ ViewData["Title"] = "Dashboard"; }
+<div class="page-heading"><div><p class="eyebrow">OPERATIONS OVERVIEW</p><h1>Dashboard</h1><p>Business date @Model.Metrics.Date.ToString("dd MMM yyyy") · São Paulo</p></div><a class="button" asp-page="Allocations">Allocate orders</a></div>
+<div class="metrics">
+<a class="metric" asp-page="Orders"><span>Pending orders</span><strong>@Model.Metrics.PendingOrders</strong><small>Awaiting your allocation</small></a>
+<a class="metric" asp-page="Sales"><span>Sales today</span><strong>R$ @((Model.Metrics.SalesTodayMinor / 100m).ToString("N2"))</strong><small>Confirmed quantities only</small></a>
+<a class="metric" asp-page="Receivables"><span>Open principal</span><strong>R$ @((Model.Metrics.OpenPrincipalMinor / 100m).ToString("N2"))</strong><small>Excludes settled installments</small></a>
+<a class="metric" asp-page="Receivables" asp-route-status="Overdue"><span>Overdue principal</span><strong>R$ @((Model.Metrics.OverduePrincipalMinor / 100m).ToString("N2"))</strong><small>Due before today</small></a>
+<a class="metric" asp-page="Stock"><span>Expiring within 7 days</span><strong>@Model.Metrics.ExpiringUnits <small>units</small></strong><small>Valid stock, including today</small></a>
+</div>
+<section class="panel"><p class="eyebrow">DAILY WORKFLOW</p><h2>From order to payment</h2><div class="workflow-links"><a asp-page="Stock"><b>01</b> Inspect stock<span>Check lots and expiration dates</span></a><a asp-page="Orders"><b>02</b> Review orders<span>Choose quantities to fulfill</span></a><a asp-page="Sales"><b>03</b> Review sales<span>Inspect generated installments</span></a><a asp-page="Receivables"><b>04</b> Register payments<span>Settle and update balances</span></a></div></section>

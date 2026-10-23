@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VanderCake.Application/VanderCake.Application.csproj" />
+    <Project Path="src/VanderCake.Contracts/VanderCake.Contracts.csproj" />
+    <Project Path="src/VanderCake.Domain/VanderCake.Domain.csproj" />
+    <Project Path="src/VanderCake.Infrastructure/VanderCake.Infrastructure.csproj" />
+    <Project Path="src/VanderCake.Server/VanderCake.Server.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VanderCake.IntegrationTests/VanderCake.IntegrationTests.csproj" />
+    <Project Path="tests/VanderCake.UnitTests/VanderCake.UnitTests.csproj" />
+  </Folder>
+</Solution>

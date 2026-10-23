@@ -1,0 +1,13 @@
+@page "{id:guid}"
+@model VanderCake.Server.Pages.Admin.AllocationHistoryModel
+@{ ViewData["Title"] = "Allocation history"; }
+<div class="page-heading"><div><p class="eyebrow">CONFIRMED FULFILLMENT</p><h1>Allocation confirmed</h1><p>Stock, sales and installments were saved together.</p></div><a class="button" asp-page="Receivables">View receivables</a></div>
+<details class="audit"><summary>Allocation audit details</summary><p>Batch @Model.Allocation.Id<br />Administrator @Model.Allocation.AdministratorId<br />Recorded UTC @Model.Allocation.ConfirmedAtUtc.ToString("u")</p></details>
+@foreach (var result in Model.Allocation.Orders.OrderBy(x => x.Order.CustomerName)) {
+<section class="panel"><div class="page-heading"><h2>@result.Order.CustomerName</h2><span class="badge good">@result.Order.Status</span></div><div class="table-wrap"><table><thead><tr><th>Product</th><th>Requested</th><th>Fulfilled</th><th>Unfulfilled</th></tr></thead><tbody>@foreach (var i in result.Order.Items) { <tr><td>@i.ProductName</td><td>@i.RequestedQuantity</td><td>@i.FulfilledQuantity</td><td>@i.UnfulfilledQuantity</td></tr> }</tbody></table></div>
+<div class="summary-strip"><span>Sale total <strong>R$ @((result.SaleTotalMinor / 100m).ToString("N2"))</strong></span>@if (result.SaleId is { } saleId) { <a asp-page="Sale" asp-route-id="@saleId">Review sale &amp; installments</a> } else { <span>No sale: all requested units were cut.</span> }<a asp-page="Order" asp-route-id="@result.Order.Id">Source order</a></div>
+<h3>Inventory movements</h3>@if (result.Movements.Count == 0) { <p class="hint">No stock was consumed.</p> } else { <div class="table-wrap"><table><thead><tr><th>Lot</th><th>Expires</th><th>Consumed units</th></tr></thead><tbody>@foreach (var m in result.Movements) { <tr><td>@m.LotCode</td><td>@m.ExpirationDate.ToString("dd MMM yyyy")</td><td>@m.Quantity</td></tr> }</tbody></table></div> }
+@if (result.Installments.Count > 0) { <h3>Generated installments</h3><div class="table-wrap"><table><thead><tr><th>Installment</th><th>Due date</th><th>Principal BRL</th><th>Action</th></tr></thead><tbody>@foreach (var a in result.Installments) { <tr><td>@a.Number</td><td>@a.DueDate.ToString("dd MMM yyyy")</td><td>@((a.PrincipalMinor / 100m).ToString("N2"))</td><td><a asp-page="Payment" asp-route-id="@a.Id">Review / settle</a></td></tr> }</tbody></table></div> }
+</section>
+}
+<p><a asp-page="Orders">Return to pending orders</a> · <a asp-page="Stock">Inspect remaining stock</a></p>

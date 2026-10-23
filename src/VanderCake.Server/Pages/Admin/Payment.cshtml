@@ -1,0 +1,13 @@
+@page "{id:guid}"
+@model VanderCake.Server.Pages.Admin.PaymentModel
+@{ ViewData["Title"] = "Settle installment"; }
+<a class="back" asp-page="Receivables">← Accounts receivable</a><p class="eyebrow">INSTALLMENT SETTLEMENT</p><h1>@Model.Account.CustomerName</h1><p>Installment @Model.Account.Number · Due @Model.Account.DueDate.ToString("dd MMM yyyy") · State: @Model.Account.Status</p><p><a asp-page="Sale" asp-route-id="@Model.Account.SaleId">View source sale and other installments</a> · <a asp-page="Customers" asp-route-id="@Model.Account.CustomerId">Updated customer balance</a></p>
+<div asp-validation-summary="All" role="alert"></div>
+@if (Model.Account.Payment is { } payment) {
+<section class="panel"><span class="badge good">Payment registered</span><h2>Paid BRL @((payment.PaidMinor / 100m).ToString("N2"))</h2><p>Paid on @payment.PaymentDate.ToString("dd MMM yyyy"). This installment has no remaining balance.</p><dl class="amounts"><dt>Principal</dt><dd>R$ @((payment.PrincipalMinor / 100m).ToString("N2"))</dd><dt>Penalty</dt><dd>R$ @((payment.PenaltyMinor / 100m).ToString("N2"))</dd><dt>Interest</dt><dd>R$ @((payment.InterestMinor / 100m).ToString("N2"))</dd><dt>Discount</dt><dd>R$ @((payment.DiscountMinor / 100m).ToString("N2"))</dd></dl><p class="hint">Receipt @payment.Id<br />Recorded UTC @payment.RecordedAtUtc.ToString("u")<br />Administrator @payment.AdministratorId</p></section>
+} else {
+<section class="panel settlement"><h2>Today's settlement quote</h2><p>Calculated by the server for @Model.Account.QuoteDate.ToString("dd MMM yyyy"). Full installment settlement only.</p><dl class="amounts"><dt>Principal</dt><dd>R$ @((Model.Account.PrincipalMinor / 100m).ToString("N2"))</dd><dt>Late penalty</dt><dd>R$ @((Model.Account.PenaltyMinor / 100m).ToString("N2"))</dd><dt>Daily simple interest</dt><dd>R$ @((Model.Account.InterestMinor / 100m).ToString("N2"))</dd><dt>Early-payment discount</dt><dd>− R$ @((Model.Account.DiscountMinor / 100m).ToString("N2"))</dd><dt class="total">Payable today</dt><dd class="total">R$ @((Model.Account.PayableMinor / 100m).ToString("N2"))</dd></dl>
+<form method="post"><input type="hidden" asp-for="Version" /><input type="hidden" asp-for="RequestKey" /><input type="hidden" asp-for="QuoteDate" /><input type="hidden" asp-for="AmountMinor" />
+@if (Model.Account.PayableMinor == 0) { <label class="check"><input asp-for="ConfirmZero" required /> Confirm full settlement with a zero payable amount.</label> }
+<p class="hint">Confirmation records this payment and settles the installment immediately.</p><div class="form-actions"><button>Register full payment</button><a asp-page="Receivables">Cancel</a></div></form></section>
+}
